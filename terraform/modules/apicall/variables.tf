@@ -7,3 +7,5 @@ variable "runtime" {
 variable "timeout" {
   default = 60
 }
+
+variable "nodeLayer" {}

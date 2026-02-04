@@ -13,6 +13,7 @@ resource "aws_lambda_function" "mailsenderLambda" {
   handler          = "${var.function_name}.handler"
   runtime          = var.runtime
   timeout          = var.timeout
+  layers           = [var.nodeLayer]
   source_code_hash = data.archive_file.lambda.output_base64sha256
 }
 

@@ -36,6 +36,13 @@ resource "aws_iam_role_policy" "mailsenderInlinePolicy" {
                     "logs:PutLogEvents"
                 ],
                 "Resource": "arn:aws:logs:*:*:*"
+            },
+            {
+                "Effect": "Allow",
+                "Action": [
+                    "bedrock:InvokeModel"
+                ],
+                "Resource": "arn:aws:bedrock:*:*:*"
             }
         ]
   }
