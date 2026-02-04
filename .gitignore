@@ -6,3 +6,4 @@ terraform.tfstate
 terraform/terraform.tfstate.backup
 *.txt
 nodejs/
+api_url.js

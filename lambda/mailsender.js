@@ -18,17 +18,20 @@ const handler = async function (event, context) {
   }
 
   event.body = JSON.parse(event.body)
-  const prompt = event.body.prompt
-  if (!prompt) {
+  if (!event.body.mpname || !event.body.sendername || !event.body.senderaddress || !event.body.sendercomplaint ) {
     return {
       headers,
       statusCode: 400,
-      body: JSON.stringify({ "ok": false, "message": "Missing required prompt" })
+      body: JSON.stringify({ "ok": false, "message": "Missing required parameters" })
     }
   }
 
-  console.log(`Prompt: ${prompt}\n`);
-  console.log("Invoking model...\n");
+  let prompt = `Write an html email addressed to ${event.body.mpname}, who is the local MP for ${event.body.sendername}, whose address is ${event.body.senderaddress}. The email should 
+                tell the MP that the sender is very unhappy about the new immigration rules that came into force in July 2025. The reasons for the sender's unhappiness are as follows: ${event.body.sendercomplaint}.
+                The email should be in a respectful tone. Leave a single empty lines between paragraphs. Make sure to include ${event.body.sendername} and ${event.body.senderaddress} in the signature. Only return the html of the final email`
+
+  // console.log(`Prompt: ${prompt}\n`);
+  // console.log("Invoking model...\n");
 
 
   // Create a new Bedrock Runtime client instance.
@@ -58,7 +61,8 @@ const handler = async function (event, context) {
   // Decode and return the response(s)
   const decodedResponseBody = new TextDecoder().decode(apiResponse.body);
   const responseBody = JSON.parse(decodedResponseBody);
-  const responsetxt = responseBody.choices[0].message.content.replace(/^<reasoning>.*<\/reasoning>/,"")
+  console.log(decodedResponseBody)
+  const responsetxt = responseBody.choices[0].message.content.replace(/^<reasoning>.*<\/reasoning>/s,"").replace(/```html/g, "").replace(/```/g,"")
 
 
   return {

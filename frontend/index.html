@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vuetify@3.7.19/dist/vuetify.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css" />
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=roboto:400,500,700" />
+  <script type="importmap">
+    {
+      "imports": {
+        "vue": "https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.esm-browser.js",
+        "vuetify": "https://cdn.jsdelivr.net/npm/vuetify@3.7.19/dist/vuetify.esm.js",
+        "api_url": "./api_url.js"
+      }
+    }
+    </script>
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+
+    .v-btn {
+      margin-bottom: 20px;
+    }
+
+    input {
+      font-size: 2rem;
+    }
+
+    .email {
+      padding: 25px;
+    }
+
+    .email p {
+      margin-top: 20px;
+    }
+  </style>
+  <title>Mail Sender</title>
+</head>
+
+<body>
+  <v-layout v-cloak id="app">
+    <v-app theme="light">
+      <v-app-bar density="compact" color="#009688">
+        <v-app-bar-title style="user-select:none;">Mail Sender</v-app-bar-title>
+      </v-app-bar>
+      <v-main>
+        <v-container fluid>
+          <v-text-field v-model="body.mpname" label="Name and surname of your MP"></v-text-field>
+          <v-text-field v-model="body.sendername" label="Your name and surname"></v-text-field>
+          <v-text-field v-model="body.senderaddress" label="Your full address"></v-text-field>
+          <v-textarea v-model="body.sendercomplaint" label="Tell your MP about your situation"></v-textarea>
+          <v-btn @click="makeemail" :disabled="processing || !body.mpname || !body.sendername || !body.senderaddress || !body.sendercomplaint" color="primary">Submit</v-btn>
+
+          <v-progress-linear indeterminate v-if="processing"></v-progress-linear>
+          <div v-if="response" v-html="response" class="email">
+          </div>
+
+        </v-container>
+      </v-main>
+    </v-app>
+  </v-layout>
+
+  <script type="module">
+    // imports
+    import { createApp, ref, computed } from "vue"
+    import { createVuetify } from "vuetify"
+    import api_url from "api_url"
+
+    // use vuetify for UI
+    const vuetify = createVuetify()
+
+    // create Vue.js app
+    createApp({
+
+      setup() {
+        // app state
+        const body = ref({})
+        const url = api_url
+        const response = ref("")
+        const processing = ref(false)
+
+
+        async function makeemail() {
+          processing.value = true
+          const rawResponse = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body.value)
+          });
+          //get just the data we want into the array
+          response.value = (await rawResponse.json()).message
+          processing.value = false
+
+          //console.log(showdata)  
+        }
+
+
+        // make state available
+
+
+        return {
+          body,
+          response,
+          makeemail,
+          processing
+        }
+      }
+    }).use(vuetify).mount('#app')
+
+
+
+  </script>
+</body>
+
+</html>
